@@ -10,7 +10,7 @@ Or you can `SSH` into the Pi over Ethernet *(I'm going to show you how)*
 First connect your laptop's Ethernet port directly to the one on your Pi.<br>
 *(Don't forget to give power to your Pi using a USB-C cable)*
 
-Open a terminal on your host PC *(laptop)* and type connect over ssh using:
+Open a terminal on your host PC *(laptop)* and connect over ssh using:
 ```sh
 # "pi" is the default user, and "raspberrypi" is the default hostname.
 $ ssh pi@raspberrypi
