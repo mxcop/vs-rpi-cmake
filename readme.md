@@ -18,7 +18,11 @@ $ ssh pi@raspberrypi
 And boom, you now have a way to execute commands on your Pi.
 
 ### WiFi on the Pi (from CLI)
-To setup wifi autoconnect for your hotspot you can use the following instructions:
+Most reliable way to get WiFi on the Pi is by using your Laptop as a WiFi hotspot.<br>
+You can enable your hotspot by typing `Mobile hotspot` into the windows search bar.<br>
+**Make sure!** you have the `Band` set to 2.4Ghz, otherwise it won't connect.
+
+To setup wifi autoconnect for your hotspot on the Pi you can use the following instructions:
 1. Run `sudo raspi-config` on your Pi to open the system config.
 2. Navigate to `1 System Options` and then `S1 Wireless LAN`.
 3. At last simply enter your wifi hotspot name, and password.
