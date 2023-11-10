@@ -1,0 +1,16 @@
+# Max <mxcop> ' clang-format
+# 10/11/2023
+
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 80
+
+# DO NOT Sort includes!
+SortIncludes: false
+
+# Pointers & References
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left

@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "graphics/shader.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void input_thread(GLFWwindow* window);
 
@@ -15,7 +17,7 @@ void error_callback(int code, const char* description)
     printf("error glfw: code %i\n%s\n", code, description);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     glfwSetErrorCallback(error_callback);
 
     // Instantiate the GLFW Window
@@ -59,70 +61,17 @@ int main() {
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    /* Load & compile vertex shader */
+    /* Load & compile the shader */
     const char* vert_src =
 #include "glsl/simple.vert"
         ;
-
-    unsigned int vert;
-    vert = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vert, 1, &vert_src, NULL);
-    glCompileShader(vert);
-
-    /* Load & compile fragment shader */
     const char* frag_src =
 #include "glsl/simple.frag"
         ;
-
-    unsigned int frag;
-    frag = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag, 1, &frag_src, NULL);
-    glCompileShader(frag);
-
-    /* Vertex and Fragment shader error checking */
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vert, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(vert, 512, NULL, infoLog);
-        printf("error: compiling vertex shader\n%s", infoLog);
-        glfwTerminate();
-        return -1;
-    }
-
-    glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        glGetShaderInfoLog(frag, 512, NULL, infoLog);
-        printf("error: compiling fragment shader\n%s", infoLog);
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Init the shader program */
-    unsigned int shader_prog;
-    shader_prog = glCreateProgram();
-
-    glAttachShader(shader_prog, vert);
-    glAttachShader(shader_prog, frag);
-    glLinkProgram(shader_prog);
-
-    /* Shader program error checking */
-    glGetProgramiv(shader_prog, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shader_prog, 512, NULL, infoLog);
-        printf("error: compiling shader program\n%s", infoLog);
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Cleanup shader files */
-    glDeleteShader(vert);
-    glDeleteShader(frag);
+    Shader shader = Shader(vert_src, frag_src);
 
     /* Bind shader program & vertex array */
-    glUseProgram(shader_prog);
+    shader.use();
     glBindVertexArray(vao);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -130,7 +79,7 @@ int main() {
     /* Start input thread */
     std::thread input_th(input_thread, window);
 
-    // Render Loop
+    /* Rendering loop */
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -138,6 +87,7 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
+        glfwPollEvents(); /* <- needs to be on the main thread! */
     }
 
     /* Join input thread */
@@ -159,6 +109,5 @@ void input_thread(GLFWwindow* window) {
         /* Exit on escape */
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
-        glfwPollEvents();
     }
 }
