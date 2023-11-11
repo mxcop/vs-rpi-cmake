@@ -1,11 +1,16 @@
 R"(
 
 #version 300 es
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec3 pos;
+
+/* Model matrix, for transforming the mesh in the world */
+uniform mat4 model;
+/* Projection matrix, for projecting onto the screen */
+uniform mat4 projection;
 
 void main()
 {
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position = projection * model * vec4(pos, 1.0);
 }
 
 )"

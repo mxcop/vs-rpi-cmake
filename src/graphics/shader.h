@@ -18,6 +18,10 @@ struct Shader {
     Shader(const char* vert_src, const char* frag_src);
     ~Shader();
 
+    /* Not move-able */
+    Shader(Shader&&) = delete;
+    Shader& operator=(Shader&&) = delete;
+
     /**
      * @brief Start using this shader program.
      */

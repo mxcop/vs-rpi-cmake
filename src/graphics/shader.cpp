@@ -8,6 +8,7 @@
 /* DEBUG safety check */
 #ifdef _DEBUG
 #include <stdio.h>
+/* Aborts if shader is uninitialized. */
 #define INIT_GUARD                                                   \
     if (handle == NULL) {                                            \
         printf(                                                      \
@@ -17,7 +18,7 @@
         abort();                                                     \
     }
 #else
-#define INIT_GUARD ;
+#define INIT_GUARD
 #endif
 
 /**

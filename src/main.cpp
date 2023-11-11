@@ -3,11 +3,53 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "graphics/shader.h"
+#include "graphics/mesh.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void input_thread(GLFWwindow* window);
+
+constexpr GLfloat g_vertex_buffer_data[] = {
+    -1.0f,-1.0f,-1.0f, // triangle 1 : begin
+    -1.0f,-1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f, // triangle 1 : end
+    1.0f, 1.0f,-1.0f, // triangle 2 : begin
+    -1.0f,-1.0f,-1.0f,
+    -1.0f, 1.0f,-1.0f, // triangle 2 : end
+    1.0f,-1.0f, 1.0f,
+    -1.0f,-1.0f,-1.0f,
+    1.0f,-1.0f,-1.0f,
+    1.0f, 1.0f,-1.0f,
+    1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f,-1.0f,
+    1.0f,-1.0f, 1.0f,
+    -1.0f,-1.0f, 1.0f,
+    -1.0f,-1.0f,-1.0f,
+    -1.0f, 1.0f, 1.0f,
+    -1.0f,-1.0f, 1.0f,
+    1.0f,-1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f,
+    1.0f,-1.0f,-1.0f,
+    1.0f, 1.0f,-1.0f,
+    1.0f,-1.0f,-1.0f,
+    1.0f, 1.0f, 1.0f,
+    1.0f,-1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f,
+    1.0f, 1.0f,-1.0f,
+    -1.0f, 1.0f,-1.0f,
+    1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f,-1.0f,
+    -1.0f, 1.0f, 1.0f,
+    1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f, 1.0f,
+    1.0f,-1.0f, 1.0f
+};
 
 constexpr float vertices[] = { -0.5f, -0.5f, 0.0f, 0.5f, -0.5f,
                               0.0f,  0.0f,  0.5f, 0.0f };
@@ -47,19 +89,7 @@ int main(int argc, char* argv[]) {
     glViewport(0, 0, 800, 600);
 
     /* Init buffers for triangle */
-    unsigned int vbo, vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-    /* Unbind triangle buffers */
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    Mesh triangle = Mesh(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
 
     /* Load & compile the shader */
     const char* vert_src =
@@ -72,7 +102,16 @@ int main(int argc, char* argv[]) {
 
     /* Bind shader program & vertex array */
     shader.use();
-    glBindVertexArray(vao);
+    triangle.use();
+
+    {
+        glm::mat4 model = glm::mat4(1.0f /* Identity matrix */);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
+        model = glm::rotate(model, 0.5f, glm::vec3(0.0f, 0.65f, 0.5f));
+
+        shader.set_mat4("model", model);
+        shader.set_mat4("projection", glm::perspective(70.0f, 1.5f, 0.1f, 1000.0f));
+    }
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
@@ -84,7 +123,7 @@ int main(int argc, char* argv[]) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Draw triangle */
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        triangle.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents(); /* <- needs to be on the main thread! */
