@@ -108,6 +108,7 @@ int main(int argc, char* argv[]) {
     }
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
 
 #if DB_DEPTH
     Mesh screen = Mesh(quad, sizeof(quad));
@@ -133,15 +134,12 @@ int main(int argc, char* argv[]) {
     std::thread input_th(input_thread, window);
 
     double prev_time = glfwGetTime();
+    double time = 0.0;
     /* Rendering loop */
     while (!glfwWindowShouldClose(window)) {
-        float dt = glfwGetTime() - prev_time;
+        double dt = glfwGetTime() - prev_time;
         prev_time = glfwGetTime();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        time += dt;
 
         /* Rotate camera */
         yaw += mouse_delta.x * dt * 1.0f;
@@ -155,19 +153,27 @@ int main(int argc, char* argv[]) {
         direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
         camera_forward = glm::normalize(direction);
 
+        /* Only draw at 65 fps */
+        if (time < 1.0 / 65.0 /* fps */) continue;
+        time = 0.0;
+
+        /* Clear the screen */
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        /* Update the view and projection matrices */
         glm::mat4 view = glm::mat4(1.0f);
         view = glm::lookAt(camera_pos, camera_pos + camera_forward, camera_up);
         shader.set_mat4("view", view);
         mouse_delta = glm::vec2(0.0f);
 
         shader.set_mat4("projection",
-                        glm::perspective(80.0f, static_cast<float>(view_width) / view_height, 0.1f, 100.0f));
+                        glm::perspective(
+                            80.0f, static_cast<float>(view_width) / view_height,
+                            0.1f, 100.0f));
         shader.set_vec3f("camera_pos", camera_pos);
 
         /* Draw triangle */
         triangle.draw();
-
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 #if DB_DEPTH
         depth_shader.use();
@@ -224,6 +230,7 @@ void input_thread(GLFWwindow* window) {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
+        /* Move the camera */
         if (w) camera_pos += camera_forward * dt * 8.0f;
         if (s) camera_pos -= camera_forward * dt * 8.0f;
         if (a)
@@ -247,6 +254,7 @@ void cursor_position_callback(GLFWwindow* window, double x, double y) {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
+    /* Questionable input code... */
     if (key == GLFW_KEY_W && action == GLFW_PRESS) w = true;
     if (key == GLFW_KEY_W && action == GLFW_RELEASE) w = false;
 
