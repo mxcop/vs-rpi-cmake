@@ -87,10 +87,10 @@ int main(int argc, char* argv[]) {
 
     /* Load & compile the shader */
     const char* vert_src =
-#include "glsl/voxel.vert"
+#include "glsl/raymarch.vert"
         ;
     const char* frag_src =
-#include "glsl/voxel.frag"
+#include "glsl/raymarch.frag"
         ;
     Shader shader = Shader(vert_src, frag_src);
 

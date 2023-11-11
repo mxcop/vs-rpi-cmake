@@ -26,6 +26,11 @@ void main ()
 	vec3 dir = normalize(frag_dir);
 	vec3 point = frag_origin;
 
+    /* Discard every other pixel */
+    // if (mod(gl_FragCoord.x, 2.0) < 1.0 || mod(gl_FragCoord.y, 2.0) < 1.0) {
+    //     discard;
+    // }
+
 	for (int i = 0; i < NUM_STEPS; i++)
 	{
 		float dist = eval_scene(point);
@@ -40,8 +45,7 @@ void main ()
 		point += dir * dist;
 	}
 
-	frag_color = vec4(0.5, 0.5, 0.5, 1);
-    gl_FragDepth = 1.0;
+	discard;
 }
 
 )"
