@@ -25,35 +25,28 @@ float fetch_voxel(vec3 idx) {
 
 /* 
     Ray to AABB intersection, 
-    @returns the near and far intersection distance 
+    @returns the distance to the nearest intersection.
 */
-vec2 ray_aabb(in vec3 ro, in vec3 rd, in vec3 boxmin, in vec3 boxmax) {
-    vec3 tmin = (boxmin - ro) / rd;
-    vec3 tmax = (boxmax - ro) / rd;
+float ray_aabb(in vec3 ro, in vec3 ird, in vec3 boxmin, in vec3 boxmax) {
+    vec3 tmin = ird * (boxmin - ro);
+    vec3 tmax = ird * (boxmax - ro);
 	
     vec3 t1 = min(tmin, tmax);
-	vec3 t2 = max(tmin, tmax);
-
 	float tN = max( max( t1.x, t1.y ), t1.z );
-	float tF = min( min( t2.x, t2.y ), t2.z );
-	if( tN > tF || tF < 0.0) return vec2( -1.0, 0.0 );
 	
-    return vec2( tN, tF );
+    return max(tN, 0.0);
 }
 
 /* Traverse the bounding volume */
-bool traverse(vec3 ro, vec3 rd) {
+bool traverse(in vec3 ro, in vec3 rd, in vec3 ird) {
     /* Move up to the edge of the bounding box */
-    vec2 bb = ray_aabb(ro, rd, vec3(0.0), vec3(1.0));
-    vec3 p = ro + rd * (bb.x + 1e-4/* Small nudge */);
+    float bb = ray_aabb(ro, ird, vec3(0.0), vec3(1.0));
+    vec3 p = ro + rd * (bb + 1e-4/* Small nudge */);
     
     /* Voxel position */
     vec3 vp = p * float(VOXELS_PER_UNIT);
     vec3 idx = floor(vp);
     
-    /* Ray direction as fraction */
-    vec3 ird = 1. / rd;
-
     /* Ray direction sign mask */
     vec3 srd = sign(rd);
     vec3 sd = ((idx - vp) + (srd * .5) + .5) * ird;
@@ -82,12 +75,13 @@ bool traverse(vec3 ro, vec3 rd) {
 }
 
 void main() {
-    /* Ray origin and direction */ 
+    /* Ray origin, direction, and direction as fraction */ 
 	vec3 ray_dir = normalize(frag_dir);
+	vec3 ray_invdir = 1. / ray_dir;
 	vec3 ray_origin = frag_origin;
     
     /* Traverse through the bounding volume */ 
-    if (traverse(ray_origin, ray_dir) == false) {
+    if (traverse(ray_origin, ray_dir, ray_invdir) == false) {
         discard;
     }
 }
