@@ -19,26 +19,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action,
 void input_thread(GLFWwindow* window);
 
 constexpr GLfloat g_vertex_buffer_data[] = {
-    0.0f, 0.0f, 0.0f,                       // triangle 1 : begin
-    0.0f, 0.0f, 1.0f,  0.0f, 1.0f,  1.0f,   // triangle 1 : end
-    1.0f,  1.0f,  0.0f,                       // triangle 2 : begin
-    0.0f, 0.0f, 0.0f, 0.0f, 1.0f,  0.0f,  // triangle 2 : end
-    1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
-    1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 1.0f,  0.0f, 1.0f,
-    0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f,  1.0f,  0.0f,
-    0.0f, 1.0f,  1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f,
-    0.0f, 1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  1.0f,  1.0f,
-    1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f, 0.0f,
-    1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
-    1.0f,  1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  0.0f, 1.0f};
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,  // triangle 1.
+    1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // triangle 2.
+    1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // triangle 3.
+    1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  // triangle 4.
+    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // triangle 5.
+    1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,  // triangle 6.
+    0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,  // triangle 7.
+    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // triangle 8.
+    1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f,  // triangle 9.
+    1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // triangle 10.
+    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // triangle 11.
+    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f   // triangle 12.
+};
 
 constexpr float quad[] = {-1.0f, -1.0f, 0.0f, 1.0f,  -1.0f, 0.0f,
                           -1.0f, 1.0f,  0.0f, -1.0f, 1.0f,  0.0f,
                           1.0f,  -1.0f, 0.0f, 1.0f,  1.0f,  0.0f};
 
 #define VOXELS_PER_UNIT 16
-#define VOXELS VOXELS_PER_UNIT * VOXELS_PER_UNIT * VOXELS_PER_UNIT
+#define VOXELS VOXELS_PER_UNIT* VOXELS_PER_UNIT* VOXELS_PER_UNIT
 
 unsigned char voxel_data[VOXELS] = {0u};
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1 /* vsync */);
+    // glfwSwapInterval(1 /* vsync */);
 
     // Initialize GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -88,14 +88,13 @@ int main(int argc, char* argv[]) {
     glViewport(0, 0, 800, 600);
 
     /* Voxel data texture */
-    for (int i = 0; i < VOXELS; i++)
-    {
+    for (int i = 0; i < VOXELS; i++) {
         if (rand() % 5 == 0)
             voxel_data[i] = rand() % 256;
         else
             voxel_data[i] = 0u;
     }
-    
+
     // voxel_data[0] = 1u;
     // voxel_data[31] = 1u;
     // voxel_data[63] = 1u;
@@ -112,7 +111,8 @@ int main(int argc, char* argv[]) {
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, VOXELS_PER_UNIT, VOXELS_PER_UNIT, VOXELS_PER_UNIT, 0, GL_RED, GL_UNSIGNED_BYTE, voxel_data);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, VOXELS_PER_UNIT, VOXELS_PER_UNIT,
+                 VOXELS_PER_UNIT, 0, GL_RED, GL_UNSIGNED_BYTE, voxel_data);
     // glGenerateMipmap(GL_TEXTURE_3D);
 
     glActiveTexture(GL_TEXTURE0);
@@ -134,18 +134,9 @@ int main(int argc, char* argv[]) {
     shader.use();
     triangle.use();
 
-    {
-        glm::mat4 model = glm::mat4(1.0f /* Identity matrix */);
-        model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
-        // model = glm::rotate(model, 0.5f, glm::vec3(0.0f, 0.65f, 0.5f));
-
-        shader.set_mat4("model", model);
-        shader.set_mat4("inverse_model", glm::inverse(model));
-        shader.set_vec3f("map_pos", glm::vec3(5.0f, 0.0f, 0.0f));
-    }
-
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
 #if DB_DEPTH
     Mesh screen = Mesh(quad, sizeof(quad));
@@ -170,6 +161,24 @@ int main(int argc, char* argv[]) {
     /* Start input thread */
     std::thread input_th(input_thread, window);
 
+    constexpr int MW = 32, MH = 32, MD = 32;
+
+    static glm::mat4 models[MW][MH][MD] = {};
+    static glm::mat4 models_inv[MW][MH][MD] = {};
+    {
+        glm::mat4 model = glm::mat4(1.0f /* Identity matrix */);
+        for (int y = 0; y < MH; y++) {
+            for (int x = 0; x < MW; x++) {
+                for (size_t z = 0; z < MD; z++) {
+                    models[x][y][z] = glm::translate(
+                        model,
+                        glm::vec3(5.0f + x * 2.0f, z * 2.0f, 5.0f + y * 2.0f));
+                    models_inv[x][y][z] = glm::inverse(models[x][y][z]);
+                }
+            }
+        }
+    }
+
     double prev_time = glfwGetTime();
     double time = 0.0;
     /* Rendering loop */
@@ -185,9 +194,10 @@ int main(int argc, char* argv[]) {
         if (pitch < -89.0f) pitch = -89.0f;
 
         glm::vec3 direction;
-        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        float xzLen = cos(glm::radians(pitch));
+        direction.x = xzLen * cos(glm::radians(yaw));
         direction.y = sin(glm::radians(pitch));
-        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction.z = xzLen * sin(glm::radians(yaw));
         camera_forward = glm::normalize(direction);
 
         /* Only draw at 65 fps */
@@ -209,8 +219,17 @@ int main(int argc, char* argv[]) {
                             0.1f, 100.0f));
         shader.set_vec3f("camera_pos", camera_pos);
 
-        /* Draw triangle */
-        triangle.draw();
+        for (int y = 0; y < MH; y++) {
+            for (int x = 0; x < MW; x++) {
+                for (size_t z = 0; z < MD; z++) {
+                    shader.set_mat4("model", models[x][y][z]);
+                    shader.set_mat4("inverse_model", models_inv[x][y][z]);
+
+                    /* Draw triangle */
+                    triangle.draw();
+                }
+            }
+        }
 
 #if DB_DEPTH
         depth_shader.use();
@@ -263,7 +282,13 @@ void input_thread(GLFWwindow* window) {
     double prev_time = glfwGetTime();
     /* Input Event Loop */
     while (!glfwWindowShouldClose(window)) {
-        float dt = glfwGetTime() - prev_time;
+        double d_dt = glfwGetTime() - prev_time;
+        
+        /* Avoid delta time which is too small for float precision */
+        if (d_dt < 1.0f / 10000.0f) {
+            continue;
+        }
+        float dt = static_cast<float>(d_dt);
         prev_time = glfwGetTime();
 
         /* Exit on escape */
