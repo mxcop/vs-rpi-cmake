@@ -8,7 +8,7 @@ precision mediump sampler3D;
 /* Maximum steps a ray will take through the bounding volume */
 #define MAX_STEPS 64
 /* Number of voxels per 1.0 unit of space in the world */
-#define VOXELS_PER_UNIT 4
+#define VOXELS_PER_UNIT 16
 
 /* Bounding volume voxel data (VOXELS_PER_UNIT ^ 3) */
 uniform sampler3D voxels;

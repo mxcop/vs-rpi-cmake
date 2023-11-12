@@ -10,7 +10,7 @@
 #include "graphics/shader.h"
 #include "graphics/mesh.h"
 
-#define DB_DEPTH 1
+#define DB_DEPTH 0
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void cursor_position_callback(GLFWwindow* window, double x, double y);
@@ -37,7 +37,10 @@ constexpr float quad[] = {-1.0f, -1.0f, 0.0f, 1.0f,  -1.0f, 0.0f,
                           -1.0f, 1.0f,  0.0f, -1.0f, 1.0f,  0.0f,
                           1.0f,  -1.0f, 0.0f, 1.0f,  1.0f,  0.0f};
 
-unsigned char voxel_data[64] = {0u};
+#define VOXELS_PER_UNIT 16
+#define VOXELS VOXELS_PER_UNIT * VOXELS_PER_UNIT * VOXELS_PER_UNIT
+
+unsigned char voxel_data[VOXELS] = {0u};
 
 int view_width, view_height;
 glm::vec2 mouse_delta;
@@ -85,7 +88,7 @@ int main(int argc, char* argv[]) {
     glViewport(0, 0, 800, 600);
 
     /* Voxel data texture */
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < VOXELS; i++)
     {
         if (rand() % 5 == 0)
             voxel_data[i] = rand() % 256;
@@ -109,7 +112,7 @@ int main(int argc, char* argv[]) {
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, 4, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, voxel_data);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, VOXELS_PER_UNIT, VOXELS_PER_UNIT, VOXELS_PER_UNIT, 0, GL_RED, GL_UNSIGNED_BYTE, voxel_data);
     // glGenerateMipmap(GL_TEXTURE_3D);
 
     glActiveTexture(GL_TEXTURE0);
