@@ -26,8 +26,8 @@ void main()
 	vec3 camera_local = (inverse_model * vec4(camera_pos, 1.0)).xyz;
 
 	// Ray origin and direction
-	frag_dir = (pos - camera_local);
 	frag_origin = camera_local;
+	frag_dir = (pos - camera_local);
 }
 
 )"

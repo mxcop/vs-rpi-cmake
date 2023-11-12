@@ -19,23 +19,25 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action,
 void input_thread(GLFWwindow* window);
 
 constexpr GLfloat g_vertex_buffer_data[] = {
-    -1.0f, -1.0f, -1.0f,                       // triangle 1 : begin
-    -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,   // triangle 1 : end
-    1.0f,  1.0f,  -1.0f,                       // triangle 2 : begin
-    -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,  // triangle 2 : end
-    1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
-    1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, 1.0f,  -1.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f,
-    -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f,
-    -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  1.0f,
-    1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, -1.0f,
-    1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
-    1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  -1.0f, 1.0f};
+    0.0f, 0.0f, 0.0f,                       // triangle 1 : begin
+    0.0f, 0.0f, 1.0f,  0.0f, 1.0f,  1.0f,   // triangle 1 : end
+    1.0f,  1.0f,  0.0f,                       // triangle 2 : begin
+    0.0f, 0.0f, 0.0f, 0.0f, 1.0f,  0.0f,  // triangle 2 : end
+    1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+    1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 1.0f,  0.0f, 1.0f,
+    0.0f, 0.0f, 1.0f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f,  1.0f,  0.0f,
+    0.0f, 1.0f,  1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f,
+    0.0f, 1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,  1.0f,  1.0f,
+    1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  0.0f, 0.0f,
+    1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+    1.0f,  1.0f,  1.0f,  1.0f,  0.0f, 1.0f,  1.0f,  1.0f,  0.0f, 1.0f};
 
 constexpr float quad[] = {-1.0f, -1.0f, 0.0f, 1.0f,  -1.0f, 0.0f,
                           -1.0f, 1.0f,  0.0f, -1.0f, 1.0f,  0.0f,
                           1.0f,  -1.0f, 0.0f, 1.0f,  1.0f,  0.0f};
+
+unsigned char voxel_data[64] = {0u};
 
 int view_width, view_height;
 glm::vec2 mouse_delta;
@@ -82,15 +84,46 @@ int main(int argc, char* argv[]) {
     // Set Viewport Dimensions
     glViewport(0, 0, 800, 600);
 
+    /* Voxel data texture */
+    for (int i = 0; i < 64; i++)
+    {
+        if (rand() % 5 == 0)
+            voxel_data[i] = rand() % 256;
+        else
+            voxel_data[i] = 0u;
+    }
+    
+    // voxel_data[0] = 1u;
+    // voxel_data[31] = 1u;
+    // voxel_data[63] = 1u;
+
+    GLuint voxel_tex;
+
+    glGenTextures(1, &voxel_tex);
+    glBindTexture(GL_TEXTURE_3D, voxel_tex);
+
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, 4, 4, 4, 0, GL_RED, GL_UNSIGNED_BYTE, voxel_data);
+    // glGenerateMipmap(GL_TEXTURE_3D);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_3D, voxel_tex);
+
     /* Init buffers for triangle */
     Mesh triangle = Mesh(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
 
     /* Load & compile the shader */
     const char* vert_src =
-#include "glsl/raymarch.vert"
+#include "glsl/voxmarch.vert"
         ;
     const char* frag_src =
-#include "glsl/raymarch.frag"
+#include "glsl/voxmarch.frag"
         ;
     Shader shader = Shader(vert_src, frag_src);
 
@@ -100,11 +133,12 @@ int main(int argc, char* argv[]) {
 
     {
         glm::mat4 model = glm::mat4(1.0f /* Identity matrix */);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-        model = glm::rotate(model, 0.5f, glm::vec3(0.0f, 0.65f, 0.5f));
+        model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
+        // model = glm::rotate(model, 0.5f, glm::vec3(0.0f, 0.65f, 0.5f));
 
         shader.set_mat4("model", model);
         shader.set_mat4("inverse_model", glm::inverse(model));
+        shader.set_vec3f("map_pos", glm::vec3(5.0f, 0.0f, 0.0f));
     }
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -142,8 +176,8 @@ int main(int argc, char* argv[]) {
         time += dt;
 
         /* Rotate camera */
-        yaw += mouse_delta.x * dt * 1.0f;
-        pitch -= mouse_delta.y * dt * 1.0f;
+        yaw += mouse_delta.x * dt * 2.0f;
+        pitch -= mouse_delta.y * dt * 2.0f;
         if (pitch > 89.0f) pitch = 89.0f;
         if (pitch < -89.0f) pitch = -89.0f;
 
@@ -171,6 +205,7 @@ int main(int argc, char* argv[]) {
                             80.0f, static_cast<float>(view_width) / view_height,
                             0.1f, 100.0f));
         shader.set_vec3f("camera_pos", camera_pos);
+        glBindTexture(GL_TEXTURE_3D, voxel_tex);
 
         /* Draw triangle */
         triangle.draw();
@@ -199,6 +234,7 @@ int main(int argc, char* argv[]) {
         shader.use();
         triangle.use();
 #endif
+        glActiveTexture(GL_TEXTURE0);
 
         glfwSwapBuffers(window);
         glfwPollEvents(); /* <- needs to be on the main thread! */
