@@ -34,5 +34,5 @@ void Mesh::use() const {
 }
 
 void Mesh::draw() const {
-    glDrawArrays(GL_TRIANGLES, 0, indices);
+    glDrawArrays(GL_TRIANGLES, 0, indices / 3);
 }
