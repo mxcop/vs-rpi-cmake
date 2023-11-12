@@ -62,6 +62,7 @@ bool traverse(in vec3 ro, in vec3 rd, in vec3 ird) {
 
         /* Compute the step mask */ 
         vec3 mask = step(sd.xyz, sd.yzx) * step(sd.xyz, sd.zxy);
+        // vec3 mask = vec3(lessThanEqual(sd.xyz, min(sd.yzx, sd.zxy)));
 
         /* Step to the next voxel */ 
         sd += mask * srd * ird;
@@ -80,7 +81,7 @@ void main() {
 	vec3 ray_invdir = 1. / ray_dir;
 	vec3 ray_origin = frag_origin;
     
-    /* Traverse through the bounding volume */ 
+    /* Traverse through the bounding volume */
     if (traverse(ray_origin, ray_dir, ray_invdir) == false) {
         discard;
     }
