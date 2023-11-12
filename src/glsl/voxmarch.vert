@@ -1,6 +1,7 @@
 R"(
 
 #version 300 es
+
 layout (location = 0) in vec3 pos;
 
 uniform vec3 camera_pos;
@@ -19,13 +20,12 @@ out vec3 frag_dir;
 
 void main()
 {
-    // texcoord = projection * view * model * vec4(pos.xy*madd+madd, 1.0, 1.0);
     gl_Position = projection * view * model * vec4(pos, 1.0);
 
-    // Convert camera position from world-space to local-space of the model
+    /* Convert camera position from world-space to local-space of the model */
 	vec3 camera_local = (inverse_model * vec4(camera_pos, 1.0)).xyz;
 
-	// Ray origin and direction
+    /* Compute ray origin and direction */
 	frag_origin = camera_local;
 	frag_dir = (pos - camera_local);
 }

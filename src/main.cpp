@@ -10,7 +10,7 @@
 #include "graphics/shader.h"
 #include "graphics/mesh.h"
 
-#define DB_DEPTH 0
+#define DB_DEPTH 1
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void cursor_position_callback(GLFWwindow* window, double x, double y);
@@ -205,7 +205,6 @@ int main(int argc, char* argv[]) {
                             80.0f, static_cast<float>(view_width) / view_height,
                             0.1f, 100.0f));
         shader.set_vec3f("camera_pos", camera_pos);
-        glBindTexture(GL_TEXTURE_3D, voxel_tex);
 
         /* Draw triangle */
         triangle.draw();
@@ -233,8 +232,10 @@ int main(int argc, char* argv[]) {
 
         shader.use();
         triangle.use();
-#endif
+
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, voxel_tex);
+#endif
 
         glfwSwapBuffers(window);
         glfwPollEvents(); /* <- needs to be on the main thread! */
